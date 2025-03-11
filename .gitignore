@@ -1,0 +1,28 @@
+# Archivos y carpetas de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de entorno virtual
+venv/
+env/
+*.env
+
+# Archivos de configuración local y sensibles
+*.sqlite3
+db.sqlite3
+SECRET_KEY=
+.env
+
+# Archivos de desarrollo
+.idea/
+.vscode/
+*.log
+.DS_Store
+*.coverage
+
+# Archivos de migraciones innecesarias
+**/migrations/*.pyc
+**/migrations/__pycache__/
+**/migrations/*_initial.py
