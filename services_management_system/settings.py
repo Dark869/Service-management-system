@@ -26,7 +26,7 @@ SECRET_KEY = config('SECRET')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'services_management_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': config('DB_ENGINE'),
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
@@ -116,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es-MX'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Mexico_City'
 
 USE_I18N = True
 
@@ -131,7 +131,7 @@ SESSION_COOKIE_AGE = 86400
 
 STATIC_URL = 'static/'
 
-STATICFILES_DIRS = (BASE_DIR.joinpath('Proyect_DSW/static'), )
+STATICFILES_DIRS = (BASE_DIR.joinpath('services_management_system/static'), )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
