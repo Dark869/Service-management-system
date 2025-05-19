@@ -1,7 +1,7 @@
 from django.conf import settings
 import requests
 
-def recaptchaVerify(recaptcha_response):
+def recaptcha_verify(recaptcha_response: str) -> bool:
     data = {
         "secret": settings.RECAPTCHA_PRIVATE_KEY,
         "response": recaptcha_response

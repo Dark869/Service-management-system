@@ -10,6 +10,7 @@ class AuthData(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     password = models.BinaryField(max_length=256)
+    codeOTP = models.BinaryField(max_length=256, blank=True, null=True)
 
 class servers(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

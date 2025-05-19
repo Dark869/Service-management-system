@@ -1,7 +1,9 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from services_management_system.utils.hashing import check_password, hash_password
+from services_management_system.utils.hashing import check_hash
 from db import models
-from services_management_system.utils.recaptchaVerify import recaptchaVerify
+from services_management_system.utils.recaptchaVerify import recaptcha_verify
+from services_management_system.utils.generateCode2FA import generate_code_2fa
 
 ERROR_MESSAGES = {
     'empty_fields': 'El usuario o contraseña no pueden estar vacíos',
@@ -9,7 +11,7 @@ ERROR_MESSAGES = {
     'captcha_not_verified': 'Captcha no verificado'
 }
 
-def login(request):
+def login(request: HttpResponse) -> HttpResponse:
     if request.session.get('logged'):
         return redirect('/')
 
@@ -19,10 +21,10 @@ def login(request):
     elif request.method == 'POST':
         email = request.POST.get('email', '').strip()
         passwd = request.POST.get('passwd', '').strip()
-        captchaToken = request.POST.get('g-recaptcha-response', '').strip()
+        captcha_token = request.POST.get('g-recaptcha-response', '').strip()
         errores = []
 
-        if not captchaToken or not recaptchaVerify(captchaToken):
+        if not captcha_token or not recaptcha_verify(captcha_token):
             errores.append(ERROR_MESSAGES['captcha_not_verified'])
             return render(request, t, {'errores': errores})
 
@@ -36,14 +38,16 @@ def login(request):
             errores.append(ERROR_MESSAGES['invalid_credentials'])
             return render(request, t, {'errores': errores})
 
-        if check_password(passwd, user_auth_data['password']):
+        if check_hash(passwd, user_auth_data['password']):
             user = models.User.objects.filter(auth_data__email=email).values("username").first()
             if not user:
                 errores.append(ERROR_MESSAGES['invalid_credentials'])
                 return render(request, t, {'errores': errores})
             request.session['logged'] = True
-            request.session['user'] = user['username']
-            return redirect('/')
+            request.session['user'] = email
+            request.session['2fa_verified'] = False
+            generate_code_2fa(request.session.get('user'))
+            return redirect('/verify2fa')
         else:
             errores.append(ERROR_MESSAGES['invalid_credentials'])
             return render(request, t, {'errores': errores})

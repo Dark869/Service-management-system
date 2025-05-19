@@ -1,0 +1,47 @@
+{% extends "pagesNoProtected.html" %}
+
+{% block titulo %}Verificación doble factor{% endblock %}
+{% load static %}
+{% block estilos %}
+{% endblock %}
+{% block scripts %}
+<!---<script src="{% static 'scripts/verifyOTP.js' %}"></script>-->
+{% endblock %}
+
+{% block encabezado %}Verificación doble factor{% endblock %}
+
+{% block contenido %}
+<div class="container d-flex aling-items-center justify-content-center">
+    <form action="/verify2fa/" id="formulario" method="POST" class="border p-4 rounded bg-dark">
+        {% csrf_token %}
+        <div class="mb-3">
+            <p class="text-center text-white mb-2 mx-auto" style="max-width: 300px;">
+                Por favor, ingresa el código de verificación que se ha enviado a telegram.
+                <p class="text-center mb-2 mx-auto text-warning" style="max-width: 300px;">Recuerda que el código tiene una validez de 30 segundos.</p>
+            </p>
+        </div>
+        <div class="mb-3">
+            <label for="codeotp" class="form-label text-white">Codigo de verificación:</label>
+            <input type="number" name="codeotp" id="codeotp" class="form-control">
+        </div>
+        <div class="d-grid m-2">
+            <p class="text-center m-0 text-white" style="max-width: 300px;">Tiempo antes de regenerar codigo</p>
+            <p class="text-white text-center m-0">1:00</p>
+            <input type="button" class="btn btn-secondary mt-2" value="Regenerar código">
+        </div>
+        <div class="d-grid m-2">
+            <button type="submit" class="btn btn-primary">Verificar</button>
+        </div>
+        {% if errores %}
+            <div id="errores" class="alert alert-danger mt-3">
+                <strong>Errores:</strong>
+                <ul id="lista-errores" class="mb-0">
+                    {% for error in errores %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

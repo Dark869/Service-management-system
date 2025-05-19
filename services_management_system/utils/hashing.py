@@ -1,8 +1,9 @@
 import bcrypt
-from db import models
 
-def hash_password(password):
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+def generate_hash(string: str) -> bytes:
+    return bcrypt.hashpw(str(string).encode('utf-8'), bcrypt.gensalt())
 
-def check_password(password, hashed):
-    return bcrypt.checkpw(password.encode('utf-8'), hashed)
+def check_hash(string: str, hashed: bytes) -> bool:
+    if isinstance(hashed, str):
+        hashed = hashed.encode('utf-8')
+    return bcrypt.checkpw(string.encode('utf-8'), hashed)
