@@ -6,6 +6,7 @@
 {% endblock %}
 {% block scripts %}
 <script src="{% static 'scripts/login.js' %}"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 {% endblock %}
 
 {% block encabezado %}Inicio de sesión{% endblock %}
@@ -23,29 +24,33 @@
             </div>
             <div class="row m-4">
                 <div class="col-md-12">
-                    <label for="passwd" class="text-white">Contraseña:</label>
+                    <label for="password" class="text-white">Contraseña:</label>
                     <input type="password" name="passwd" id="passwd" class="form-control">
                 </div>
             </div>
+            <div class="row m-4">
+                <div class="col-md-12">
+                    <label for="recaptcha" class="text-white">Captcha:</label>
+                    <div class="g-recaptcha" data-sitekey="6LcdWT8rAAAAAGqdlcWntEM2-GAjmBifP-3rDnYB"></div>
+                </div>
+            </div>
+            </div>
+            <div class="row m-4">
             <div class="row m-4 text-center">
                 <div class="col-md-12">
                     <button type="submit" name="submit" id="submit" class="btn btn-primary">Iniciar sesión</button>
                 </div>
             </div>
-            <div id="box-errors" class="row justify-content-center m-2">
-                <div class="col-md-12 text-center">
-                    
-                </div>
             </div>
             {% if errores %}
-            <div id="errores" class="alert alert-danger mt-3">
-                <strong>Errores:</strong>
-                <ul id="lista-errores" class="mb-0">
-                    {% for error in errores %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
+                <div id="errores" class="alert alert-danger mt-3">
+                    <strong>Errores:</strong>
+                    <ul id="lista-errores" class="mb-0">
+                        {% for error in errores %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             {% endif %}
         </form>
     </div>

@@ -137,3 +137,5 @@ STATICFILES_DIRS = (BASE_DIR.joinpath('services_management_system/static'), )
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY')
