@@ -139,3 +139,6 @@ STATICFILES_DIRS = (BASE_DIR.joinpath('services_management_system/static'), )
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY')
+
+TOKEN_BOT = config('TOKEN_BOT')
+CHAT_ID= config('CHAT_ID')
