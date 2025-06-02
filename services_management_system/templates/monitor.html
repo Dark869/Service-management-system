@@ -1,0 +1,25 @@
+{% extends "AdministrarServiciosPROPUESTA2.html" %}
+
+{% block titulo %}Monitoreo{% endblock %}
+{% load static %}
+
+{% block scripts %}
+{% endblock %}
+
+{% block encabezado %}Monitoreo de servidores{% endblock %}
+{% block contenido %}
+    <div class="row">
+        <div class="col-sm-3">
+            <ul class="nav nav-pills nav-fill gap-2 p-1 small shadow-sm" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-white); --bs-nav-pills-link-active-bg: var(--bs-black);">
+                {% for IP in IPs %}
+                    <li class="nav-item">
+                        <button class="nav-link active rounded-5 mb-2" data-bs-toggle="tab" type="button">{{ IP }}</button>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-sm-9">
+
+        </div>
+    </div>
+{% endblock %}

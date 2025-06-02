@@ -12,6 +12,7 @@ Thumbs.db
 migrations/
 
 .env
+.env.cpt
 
 include/
 Lib/

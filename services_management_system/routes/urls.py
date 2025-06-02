@@ -7,4 +7,5 @@ urlpatterns = [
     path('', index.index, name='index'),
     path('login/', login.login, name='login'),
     path('verify2fa/', verity_otp.verity_otp, name='verify2fa'),
+    path('plantilla', index.plantilla, name='plantilla')
 ]
