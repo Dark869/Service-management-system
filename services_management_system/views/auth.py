@@ -8,7 +8,8 @@ from services_management_system.utils.generateCode2FA import generate_code_2fa
 ERROR_MESSAGES = {
     'empty_fields': 'El usuario o contraseña no pueden estar vacíos',
     'invalid_credentials': 'El usuario o contraseña no son correctos',
-    'captcha_not_verified': 'Captcha no verificado'
+    'captcha_not_verified': 'Captcha no verificado',
+    'error_generating_code': 'Error al generar el código de verificación',
 }
 
 def login(request: HttpResponse) -> HttpResponse:
@@ -46,8 +47,15 @@ def login(request: HttpResponse) -> HttpResponse:
             request.session['logged'] = True
             request.session['user'] = email
             request.session['2fa_verified'] = False
-            generate_code_2fa(request.session.get('user'))
+            if not generate_code_2fa(request.session.get('user')):
+                errores.append(ERROR_MESSAGES['error_generating_code'])
+                return render(request, t, {'errores': errores})
             return redirect('/verify2fa')
         else:
             errores.append(ERROR_MESSAGES['invalid_credentials'])
             return render(request, t, {'errores': errores})
+
+def logout(request: HttpResponse) -> HttpResponse:
+    if request.method == 'GET':
+        request.session.flush()
+        return redirect('/')

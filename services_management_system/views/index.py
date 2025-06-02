@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from services_management_system.middlewares.loginRequest import twofa_verified
+from services_management_system.middlewares.loginRequest import login_request
 
-@twofa_verified
+@login_request
 def index(request: HttpResponse) -> HttpResponse:
-    return render(request, 'index.html')
+    return render(request, 'pagesProtected.html')
