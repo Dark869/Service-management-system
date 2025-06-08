@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from decouple import config
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = os.environ.get('DEBUG')
 
 ALLOWED_HOSTS = ["*"]
 
@@ -38,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #'services_management_system.routes',
     'services_management_system.views',
+    'services_management_system',
     'db',
 ]
 
@@ -78,12 +81,12 @@ WSGI_APPLICATION = 'services_management_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': config('DB_ENGINE'),
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('BD_NAME'),
+        'USER': os.environ.get('BD_USER'),
+        'PASSWORD': os.environ.get('BD_PASSWORD'),
+        'HOST': os.environ.get('BD_HOST'),
+        'PORT': os.environ.get('BD_PORT'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
@@ -137,7 +140,7 @@ STATICFILES_DIRS = (BASE_DIR.joinpath('services_management_system/static'), )
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-RECAPTCHA_PRIVATE_KEY = config('RECAPTCHA_PRIVATE_KEY')
+RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
-TOKEN_BOT = config('TOKEN_BOT')
-CHAT_ID= config('CHAT_ID')
+TOKEN_BOT = os.environ.get('TOKEN_BOT')
+CHAT_ID= os.environ.get('CHAT_ID')
