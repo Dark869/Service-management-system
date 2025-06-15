@@ -69,7 +69,7 @@ $(function () {
     const otpCode = $("#codeotp").val();
     const csrftoken = getCookie("csrftoken");
     $.ajax({
-      url: "/verify2fa/",
+      url: "/registerServer/",
       type: "POST",
       data: { codeotp: otpCode },
       headers: {
