@@ -9,6 +9,9 @@ Thumbs.db
 
 *.sqlite3
 
+.logs/
+.ssh/
+
 migrations/
 
 .env
