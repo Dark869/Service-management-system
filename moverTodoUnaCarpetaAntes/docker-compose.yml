@@ -15,6 +15,9 @@ services:
          RECAPTCHA_PRIVATE_KEY: ${RECAPTCHA_PRIVATE_KEY}
          TOKEN_BOT: ${TOKEN_BOT}
          CHAT_ID: ${CHAT_ID}
+         SSH_PUBLIC: ${SSH_PUBLIC}
+         SSH_PRIVATE: ${SSH_PRIVATE}
+         FINGERPRINT: ${FINGERPRINT}
       volumes:
         - ./Service-management-system:/code
       deploy:
@@ -47,6 +50,7 @@ services:
         - 443:443
       volumes:
         - ./nginx:/etc/nginx/conf.d
+        - ./Service-management-system/services_management_system/static/:/static
         - ./projectContent/static:/static
         - ./certificados:/certs
         - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
