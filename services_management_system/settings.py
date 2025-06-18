@@ -146,6 +146,7 @@ STATIC_URL = 'static/'
 
 STATICFILES_DIRS = (BASE_DIR.joinpath('services_management_system/static'), )
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -153,7 +154,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
-SSH_PUBLIC= os.environ.get('SSH_PUBLIC')
+SSH_PUBLIC = os.environ.get('SSH_PUBLIC')
+SSH_PRIVATE = os.environ.get('SSH_PRIVATE')
+FINGERPRINT = os.environ.get('FINGERPRINT')
 
 TOKEN_BOT = os.environ.get('TOKEN_BOT')
 CHAT_ID= os.environ.get('CHAT_ID')
@@ -172,6 +175,13 @@ LOG_DEFINITIONS = {
     'ssh_operations': {
         'filename': 'logSSH.log',
         'logger_name_prefix': 'SSH',
+        'level': 'INFO',
+        'maxBytes': 5 * 1024 * 1024,
+        'backupCount': 5,
+    },
+    'service_registration': {
+        'filename': 'RegistroServicio.log',
+        'logger_name_prefix': 'RegistroServicio',
         'level': 'INFO',
         'maxBytes': 5 * 1024 * 1024,
         'backupCount': 5,

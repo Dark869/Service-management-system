@@ -7,7 +7,7 @@
 
 {% block encabezado %}Registro de servidores{% endblock %}
 {% block contenido %}
-    <div class="container d-flex aling-items-center justify-content-center">
+<div class="container d-flex aling-items-center justify-content-center">
     <form action="/registerServer/" id="formulario" method="POST" class="border p-4 rounded bg-dark">
         {% csrf_token %}
         <div class="mb-3">
@@ -15,19 +15,20 @@
             <input type="text" name="name" id="name" class="form-control">
         </div>
         <div class="mb-3">
-            <label for="user" class="form-label text-white">Usuario:</label>
-            <input type="text" name="user" id="user" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label text-white">Contraseña:</label>
-            <input type="password" name="password" id="password" class="form-control">
-        </div>
-        <div class="mb-3">
             <label for="IP" class="form-label text-white">IP:</label>
             <input type="text" name="IP" id="IP" class="form-control">
         </div>
+        <div class="mb-3">
+            <label for="password" class="form-label text-white">Contraseña de usario monitoreo:</label>
+            <input type="password" name="password" id="password" class="form-control">
+        </div>
         <div class="d-grid">
             <button type="submit" class="btn btn-primary">Registrar servidor</button>
+        </div>
+        <div>
+            <p class="text-white">
+                Antes de registrar, descargue el <a href="{% static 'scripts/agent.sh' %}">instalador</a> e instalalo en el servidor
+            </p>
         </div>
         {% if errores %}
             <div id="errores" class="alert alert-danger mt-3">
@@ -35,6 +36,16 @@
                 <ul id="lista-errores" class="mb-0">
                     {% for error in errores %}
                         <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if correctos %}
+            <div id="correcto" class="alert alert-success mt-3">
+                <strong>Correcto:</strong>
+                <ul id="lista-correcto" class="mb-0">
+                    {% for correcto in correctos %}
+                        <li>{{ correcto }}</li>
                     {% endfor %}
                 </ul>
             </div>

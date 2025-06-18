@@ -7,16 +7,16 @@
 
 {% block encabezado %}Registrar servicio{% endblock %}
 {% block contenido %}
-    <div class="container d-flex aling-items-center justify-content-center">
+<div class="container d-flex aling-items-center justify-content-center">
     <form action="/registerService/" id="formulario" method="POST" class="border p-4 rounded bg-dark">
         {% csrf_token %}
         <div class="mb-3">
-            <label for="name" class="form-label text-white">Nombre del servicio:</label>
-            <input type="text" name="name" id="name" class="form-control">
+            <label for="nameservice" class="form-label text-white">Nombre del servicio:</label>
+            <input type="text" name="nameservice" id="nameservice" class="form-control">
         </div>
         <div class="mb-3">
-            <label for="ip" class="form-label text-white">Servidor:</label>
-            <input type="text" name="IP" id="IP" class="form-control">
+            <label for="nameserver" class="form-label text-white">Nombre del servidor:</label>
+            <input type="text" name="nameserver" id="nameserver" class="form-control">
         </div>
         <div class="d-grid">
             <button type="submit" class="btn btn-primary">Registrar servicio</button>
@@ -27,6 +27,16 @@
                 <ul id="lista-errores" class="mb-0">
                     {% for error in errores %}
                         <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if correctos %}
+            <div id="correcto" class="alert alert-success mt-3">
+                <strong>Correcto:</strong>
+                <ul id="lista-correcto" class="mb-0">
+                    {% for correcto in correctos %}
+                        <li>{{ correcto }}</li>
                     {% endfor %}
                 </ul>
             </div>
