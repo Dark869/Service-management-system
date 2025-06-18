@@ -15,10 +15,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Force embedded JRE
-        run: echo "sonar.scanner.enableAutodetect=false" >> $RUNNER_TEMP/sonar-scanner-cli-7.1.0.4889-Linux-X64/conf/sonar-scanner.properties
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-      - uses: SonarSource/sonarqube-scan-action@v5
+      - name: Install SonarScanner
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.1.0.4889-linux.zip
+          unzip sonar-scanner.zip -d $HOME
+          echo "$HOME/sonar-scanner-7.1.0.4889-linux/bin" >> $GITHUB_PATH
+
+      - name: Run SonarScanner
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=TU_PROYECTO \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
