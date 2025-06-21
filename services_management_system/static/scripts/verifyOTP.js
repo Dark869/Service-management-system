@@ -43,7 +43,7 @@ $(function () {
           $("#listErrors").text("El código fue verificado correctamente.");
           setTimeout(function () {
             window.location.href = response.redirectUrl;
-          }, 3000);
+          }, 2000);
         } else {
           $("#errores2")
             .removeClass("d-none alert-success")
@@ -51,7 +51,7 @@ $(function () {
           $("#listErrors").text(response.message);
           setTimeout(function () {
             window.location.href = response.redirectUrl;
-          }, 3000);
+          }, 2000);
         }
       },
       error: function () {

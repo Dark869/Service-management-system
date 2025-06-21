@@ -1,52 +1,92 @@
 $(function () {
-    function showAlert(mensaje) {
-        return `
-        <div class="alert alert-danger" role="alert">
-          ${mensaje}
-        </div>`;
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  $("#formulario").on("submit", function (e) {
+    e.preventDefault();
+
+    const email = $("#email").val().trim();
+    const password = $("#passwd").val().trim();
+    const captcha = $("#g-recaptcha-response").val().trim();
+    const csrftoken = getCookie("csrftoken").trim();
+
+    if (!email) {
+      $("#boxStatus").text("Error:");
+      $("#errores")
+        .removeClass("d-none alert-success")
+        .addClass("alert-danger");
+      $("#listErrors").text("Debes ingresar un correo electrónico.");
+      return;
     }
 
-    function isEmpty(input) {
-        return input.val().trim() === "";
+    if (!password) {
+      $("#boxStatus").text("Error:");
+      $("#errores")
+        .removeClass("d-none alert-success")
+        .addClass("alert-danger");
+      $("#listErrors").text("Debes ingresar una contraseña.");
+      return;
     }
 
-    function hasInvalidSymbols(input) {
-        const regex = /^[a-zA-Z0-9_\-.@]*$/;
-        return !regex.test(input.val());
+    if (!captcha) {
+      $("#boxStatus").text("Error:");
+      $("#errores")
+        .removeClass("d-none alert-success")
+        .addClass("alert-danger");
+      $("#listErrors").text("Debes completar el captcha.");
+      return;
     }
 
-    $('#formulario').on('submit', function (evento) {
-        let withErrors = false;
-        $('#box-errors').empty();
-
-        if (isEmpty($('#nick'))) {
-            $('#nick').addClass('is-invalid');
-            $('#box-errors').append(showAlert('El campo nombre de usuario está vacío.'));
-            withErrors = true;
+    $.ajax({
+      url: "/login/",
+      type: "POST",
+      data: {
+        email: email,
+        passwd: password,
+        g_recaptcha_response: captcha,
+      },
+      headers: {
+        "X-CSRFToken": csrftoken,
+      },
+      success: function (response) {
+        if (response.status === "success") {
+          $("#boxStatus").text("Éxito:");
+          $("#errores")
+            .removeClass("d-none alert-danger")
+            .addClass("alert-success");
+          $("#listErrors").text("Inicio de sesión exitoso.");
+          setTimeout(function () {
+            window.location.href = response.redirectUrl;
+          }, 2000);
         } else {
-            $('#nick').removeClass('is-invalid');
+          $("#boxStatus").text("Error:");
+          $("#errores")
+            .removeClass("d-none alert-success")
+            .addClass("alert-danger");
+          $("#listErrors").text(response.message);
         }
-
-        if (isEmpty($('#passwd'))) {
-            $('#passwd').addClass('is-invalid');
-            $('#box-errors').append(showAlert('El campo contraseña está vacío.'));
-            withErrors = true;
-        } else {
-            $('#passwd').removeClass('is-invalid');
-        }
-
-        if (!withErrors && (hasInvalidSymbols($('#nick')) || hasInvalidSymbols($('#passwd')))) {
-            $('#nick').addClass('is-invalid');
-            $('#passwd').addClass('is-invalid');
-            $('#box-errors').append(showAlert('Nombre de usuario o contraseña incorrectos.'));
-            withErrors = true;
-        } else {
-            $('#nick').removeClass('is-invalid');
-            $('#passwd').removeClass('is-invalid');
-        }
-
-        if (withErrors) {
-            evento.preventDefault();
-        }
+      },
+      error: function () {
+        $("#boxStatus").text("Error:");
+        $("#errores")
+          .removeClass("d-none alert-success")
+          .addClass("alert-danger");
+        $("#listErrors").text(
+          "Ocurrió un error al iniciar sesión. Por favor, inténtalo de nuevo."
+        );
+      },
     });
+  });
 });
