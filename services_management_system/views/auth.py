@@ -58,4 +58,4 @@ def login(request: HttpResponse) -> HttpResponse:
 def logout(request: HttpResponse) -> HttpResponse:
     if request.method == 'GET':
         request.session.flush()
-        return redirect('/')
+        return redirect('/login')
