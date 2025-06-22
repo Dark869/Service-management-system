@@ -25,11 +25,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-CSRF_TRUSTED_ORIGINS = ["https://progseg25.com"]
+CSRF_TRUSTED_ORIGINS = [
+    'https://progseg25.com'
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Fuerza a que las cookies CSRF solo se envíen por HTTPS
+CSRF_COOKIE_SECURE = True
+# Fuerza a que las cookies de sesión solo se envíen por HTTPS
+SESSION_COOKIE_SECURE = True
+# Si tu Nginx puede enviar X-Forwarded-Host (que suele ser el caso), esto ayuda a Django a resolver URLs correctamente.
+USE_X_FORWARDED_HOST = True
 
 # Application definition
 
@@ -136,6 +146,7 @@ STATIC_URL = 'static/'
 
 STATICFILES_DIRS = (BASE_DIR.joinpath('services_management_system/static'), )
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -143,5 +154,89 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
+SSH_PUBLIC = os.environ.get('SSH_PUBLIC')
+SSH_PRIVATE = os.environ.get('SSH_PRIVATE')
+FINGERPRINT = os.environ.get('FINGERPRINT')
+
 TOKEN_BOT = os.environ.get('TOKEN_BOT')
 CHAT_ID= os.environ.get('CHAT_ID')
+
+LOGS_DIR = BASE_DIR.joinpath('.logs')
+os.makedirs(LOGS_DIR, exist_ok=True)
+
+LOG_DEFINITIONS = {
+    'server_registration': {
+        'filename': 'RegistroServer.log',
+        'logger_name_prefix': 'registerServer',
+        'level': 'INFO',
+        'maxBytes': 5 * 1024 * 1024,
+        'backupCount': 5,
+    },
+    'ssh_operations': {
+        'filename': 'logSSH.log',
+        'logger_name_prefix': 'SSH',
+        'level': 'INFO',
+        'maxBytes': 5 * 1024 * 1024,
+        'backupCount': 5,
+    },
+    'service_registration': {
+        'filename': 'RegistroServicio.log',
+        'logger_name_prefix': 'RegistroServicio',
+        'level': 'INFO',
+        'maxBytes': 5 * 1024 * 1024,
+        'backupCount': 5,
+    },
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'custom_file_formatter': {
+            'format': '%(asctime)s - %(levelname)s - [%(name)s] - %(message)s',
+            'datefmt': '%d-%b-%Y %H:%M:%S',
+        },
+    },
+
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'custom_file_formatter',
+        },
+    },
+
+    'loggers': {
+        '': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            'propagate': True,
+        },
+    },
+}
+
+for key, definition in LOG_DEFINITIONS.items():
+    handler_name = f'{key}_file_handler'
+    log_file_path = os.path.join(LOGS_DIR, definition['filename'])
+
+    LOGGING['handlers'][handler_name] = {
+        'level': definition['level'],
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': log_file_path,
+        'maxBytes': definition['maxBytes'],
+        'backupCount': definition['backupCount'],
+        'formatter': 'custom_file_formatter',
+    }
+
+    logger_name_to_assign = definition['logger_name_prefix']
+    
+    if logger_name_to_assign not in LOGGING['loggers']:
+        LOGGING['loggers'][logger_name_to_assign] = {
+            'handlers': [],
+            'level': definition['level'],
+            'propagate': False,
+        }
+    
+    if handler_name not in LOGGING['loggers'][logger_name_to_assign]['handlers']:
+        LOGGING['loggers'][logger_name_to_assign]['handlers'].append(handler_name)

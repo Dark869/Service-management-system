@@ -12,7 +12,7 @@
 
 {% block contenido %}
 <div class="container d-flex aling-items-center justify-content-center">
-    <form action="/login/" id="formulario" method="POST" class="border p-4 rounded bg-dark">
+    <form id="formulario" class="border p-4 rounded bg-dark">
         {% csrf_token %}
         <div class="mb-3">
             <label for="email" class="form-label text-white">Correo:</label>
@@ -29,16 +29,12 @@
         <div class="d-grid">
             <button type="submit" class="btn btn-primary">Iniciar sesión</button>
         </div>
-        {% if errores %}
-            <div id="errores" class="alert alert-danger mt-3">
-                <strong>Errores:</strong>
-                <ul id="lista-errores" class="mb-0">
-                    {% for error in errores %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+        <div id="errores" class="alert alert-danger mt-3 d-none text-break">
+            <strong id="boxStatus">Errores:</strong>
+            <ul class="mb-0">
+                <li class="text-break" id="listErrors"></li>
+            </ul>
+        </div>
     </form>
 </div>
 {% endblock %}

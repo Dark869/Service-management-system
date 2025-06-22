@@ -1,11 +1,13 @@
 from services_management_system.utils.hashing import generate_hash
 from services_management_system.utils.sendCodeTelegram import send_code_telegram
 from db import models
-import random
+import secrets
+import string
 import threading
 
 def generate_code_2fa(user: str) -> bool:
-    code = str(random.randint(100000, 999999))
+    caracteres = string.ascii_letters + string.digits
+    code = ''.join(secrets.choice(caracteres) for _ in range(12))
     hashed_code = generate_hash(code)
     if not send_code_telegram(code):
         return False

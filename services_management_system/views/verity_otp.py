@@ -24,11 +24,16 @@ def verity_otp(request: HttpResponse) -> HttpResponse | JsonResponse:
 
         if not user_auth['codeOTP']:
             errores.append('El código no ha sido generado')
-            return JsonResponse({'status': 'error', 'message': 'El código no ha sido generado', 'errores': errores})
+            request.session['2fa_verified'] = False
+            request.session['logged'] = False
+            return JsonResponse({'status': 'error', 'message': 'El código caduco o no fue generado', 'errores': errores, 'redirectUrl': '/login'})
 
         if check_hash(otp, user_auth['codeOTP']):
             request.session['2fa_verified'] = True
-            return JsonResponse({'status': 'success', 'message': 'Código verificado correctamente', 'redirectUrl': '/'})
+            return JsonResponse({'status': 'success', 'redirectUrl': '/'})
+
         else:
             errores.append('El código es incorrecto')
-            return JsonResponse({'status': 'error', 'message': 'El código es incorrecto', 'errores': errores})
+            request.session['2fa_verified'] = False
+            request.session['logged'] = False
+            return JsonResponse({'status': 'error', 'message': 'El código es incorrecto', 'errores': errores, 'redirectUrl': '/login'})

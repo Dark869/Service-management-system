@@ -9,12 +9,18 @@ Thumbs.db
 
 *.sqlite3
 
+.logs/
+.ssh/
+
 migrations/
 
 .env
+.env.cpt
 
 include/
 Lib/
 Scripts/
 
 pyvenv.cfg
+
+certificados

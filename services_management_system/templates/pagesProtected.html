@@ -41,34 +41,31 @@
                     data-bs-toggle="tab"
                     type="button"
                   >
+                  <a href="/registerServer">
                     Registrar servidor
+                  </a>
                   </button>
                 </li>
                 <li class="nav-item">
                   <button
-                    class="nav-link rounded-5 mb-2"
+                    class="nav-link active rounded-5 mb-2"
                     data-bs-toggle="tab"
                     type="button"
                   >
-                    Levantar servidor
+                  <a href="/registerService">
+                    Registrar servicio
+                  </a>
                   </button>
                 </li>
                 <li class="nav-item">
                   <button
-                    class="nav-link rounded-5 mb-2"
+                    class="nav-link active rounded-5 mb-2"
                     data-bs-toggle="tab"
                     type="button"
                   >
-                    Administrar servidor
-                  </button>
-                </li>
-                <li class="nav-item">
-                  <button
-                    class="nav-link rounded-5 mb-2"
-                    data-bs-toggle="tab"
-                    type="button"
-                  >
-                    Monitorizar servidores
+                  <a href="/serverAdministrator">
+                    Administrar servers
+                  </a>
                   </button>
                 </li>
                 <li class="nav-item">
@@ -87,7 +84,7 @@
       </header>
       <section class="row flex-grow-1">
         <div class="col-sm-12">
-          <div class="m-5 d-flex justify-content-center align-items-center">
+          <div class="d-flex justify-content-center align-items-center">
             {% block contenido %}{% endblock %}
           </div>
         </div>
