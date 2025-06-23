@@ -13,4 +13,4 @@ RUN chmod +x /start/run.sh
 RUN useradd tazo -s /bin/bash
 USER tazo
 
-CMD /start/run.sh
+CMD ["/start/run.sh"]
