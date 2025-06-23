@@ -81,22 +81,21 @@ def register_server(ip: str, password: str) -> bool:
 
     return registration_success
 
-def verify_fingerprint(name: str, ip: str) -> bool:
+def connect_client(ip: str) -> paramiko.SSHClient:
     fingerprint = FINGERPRINT
     key_private = SSH_PRIVATE
     clave_key = CLAVE_OF_KEY
-
     client = paramiko.SSHClient()
-
+    
     try:
         client.load_host_keys(fingerprint)
         ssh_log.info(f"Claves de host cargadas.")
     except FileNotFoundError:
         ssh_log.error(f"Archivo known_hosts no encontrado.")
-        return False
+        return None
     except Exception as e:
         ssh_log.error(f"Fallo al cargar claves de host para {ip}: {e}", exc_info=True)
-        return False
+        return None
 
     client.set_missing_host_key_policy(paramiko.RejectPolicy())
 
@@ -105,55 +104,33 @@ def verify_fingerprint(name: str, ip: str) -> bool:
         ssh_log.info(f"Intentando verificación de conexión a {ip} usando clave privada y known_hosts")
         client.connect(hostname=ip, username=str("monitoreo"), pkey=private_key, timeout=10)
         ssh_log.info(f"Conexión verificada con éxito para {ip}.")
-        return True
+        return client
     except paramiko.BadHostKeyException as e:
         ssh_log.error(f"Clave de host incorrecta para {ip}. La clave actual del servidor no coincide con la guardada. Detalle: {e}")
-        return False
+        return None
     except (paramiko.AuthenticationException, paramiko.PasswordRequiredException) as e:
         ssh_log.error(f"Fallo durante la verificación con clave privada para {ip}. Detalle: {e}")
-        return False
+        return None
     except paramiko.SSHException as e:
         ssh_log.error(f"Fallo de conexión SSH durante la verificación a {ip}. Detalle: {e}")
-        return False
+        return None
     except FileNotFoundError as e:
         ssh_log.error(f"Archivo de clave SSH privada no encontrado: {e}")
-        return False
+        return None
     except Exception as e:
         ssh_log.error(f"ERROR INESPERADO: Ocurrió un error durante la verificación de conexión a {ip}: {e}", exc_info=True)
-        return False
-    finally:
-        if client:
-            client.close()
-            ssh_log.info(f"Conexión SSH de verificación a {ip} cerrada.")
+        return None
 
-def verify_service(name: str, service: str, ip: str) -> bool:
-    fingerprint = FINGERPRINT
-    key_private = SSH_PRIVATE
-    clave_key = CLAVE_OF_KEY
-    
-    client = paramiko.SSHClient()
-
+def verify_service(service: str, ip: str) -> bool:
+    client = None 
     try:
-        client.load_host_keys(fingerprint)
-        ssh_log.info(f"Claves de host cargadas.")
-    except FileNotFoundError:
-        ssh_log.error(f"Archivo known_hosts no encontrado.")
-        return False
-    except Exception as e:
-        ssh_log.error(f"Fallo al cargar claves de host para {ip}: {e}", exc_info=True)
-        return False
-
-    client.set_missing_host_key_policy(paramiko.RejectPolicy())
-
-    try:
-        private_key = paramiko.RSAKey.from_private_key_file(key_private, password=clave_key)
-        ssh_log.info(f"Intentando conectar a {ip} para verificar servicio '{service}'")
-        client.connect(hostname=ip, username=str("monitoreo"), pkey=private_key, timeout=10)
-        ssh_log.info(f"Conexión SSH establecida con éxito a {ip}.")
-
+        client = connect_client(ip)
+        if client is None:
+            ssh_log.error(f"No se pudo establecer la conexión SSH en la {ip}.")
+            return False
+        
         command = f"systemctl status {service} &>/dev/null; echo $?"
         ssh_log.info(f"Ejecutando comando remoto: '{command}' en {ip}")
-        
         _stdin, stdout, stderr = client.exec_command(command)
         exit_code_str = stdout.read().decode('utf-8').strip()
         remote_error = stderr.read().decode('utf-8').strip()
@@ -163,7 +140,7 @@ def verify_service(name: str, service: str, ip: str) -> bool:
 
         try:
             exit_code = int(exit_code_str)
-            if exit_code == 0:
+            if exit_code in [0,3]:
                 ssh_log.info(f"Servicio '{service}' existe.")
                 return True
             else:
@@ -172,8 +149,11 @@ def verify_service(name: str, service: str, ip: str) -> bool:
         except ValueError:
             ssh_log.error(f"No se pudo parsear el código de salida '{exit_code_str}' para el servicio '{service}'.")
             return False
-    except:
-        ssh_log.error(f"Fallo de conexión SSH.")
+    except paramiko.SSHException as e:
+        ssh_log.error(f"Error en la ejecución del comando para '{service}' en {ip}: {e}")
+        return False
+    except Exception as e:
+        ssh_log.error(f"Error al verificar el servicio '{service}' en {ip}: {e}", exc_info=True)
         return False
     finally:
         if client:
@@ -181,30 +161,12 @@ def verify_service(name: str, service: str, ip: str) -> bool:
             ssh_log.info(f"Conexión SSH a {ip} cerrada.")
 
 def administrator_server(ip: str, service: str, option: str) -> bool:
-    fingerprint = FINGERPRINT
-    key_private = SSH_PRIVATE
-    clave_key = CLAVE_OF_KEY
-
-    client = paramiko.SSHClient()
-
+    client = None
     try:
-        client.load_host_keys(fingerprint)
-        ssh_log.info(f"Claves de host cargadas.")
-    except FileNotFoundError:
-        ssh_log.error(f"Archivo known_hosts no encontrado.")
-        return False
-    except Exception as e:
-        ssh_log.error(f"Fallo al cargar claves de host para {ip}: {e}", exc_info=True)
-        return False
-
-    client.set_missing_host_key_policy(paramiko.RejectPolicy())
-
-    try:
-        private_key = paramiko.RSAKey.from_private_key_file(key_private, password=clave_key)
-        ssh_log.info(f"Intentando conectar a {ip} para administrar servicio {service}")
-        
-        client.connect(hostname=ip, username=str("monitoreo"), pkey=private_key, timeout=10)
-        ssh_log.info(f"Conexión SSH establecida con éxito a {ip}.")
+        client = connect_client(ip)
+        if client is None:
+            ssh_log.error(f"No se pudo establecer la conexión SSH en la {ip}.")
+            return False
 
         if not service.endswith('.service'):
             service_extend = f"{service}.service"
@@ -212,14 +174,11 @@ def administrator_server(ip: str, service: str, option: str) -> bool:
             service_extend = service
 
         command = f"sudo systemctl {option} {service_extend}"
-        
         ssh_log.info(f"Ejecutando comando remoto: '{command}' en {ip}")
 
         _stdin, stdout, stderr = client.exec_command(command, get_pty=True)
-        
         output = stdout.read().decode('utf-8').strip()
         error_output = stderr.read().decode('utf-8').strip()
-
         exit_status = stdout.channel.recv_exit_status()
 
         if exit_status == 0:
@@ -228,7 +187,6 @@ def administrator_server(ip: str, service: str, option: str) -> bool:
         else:
             ssh_log.error(f"Fallo al ejecutar '{command}' en {ip}.")
             return False
-
     except:
         ssh_log.error(f"Fallo de conexión SSH.")
         return False
@@ -238,30 +196,12 @@ def administrator_server(ip: str, service: str, option: str) -> bool:
             ssh_log.info(f"Conexión SSH a {ip} cerrada.")
 
 def status_service(ip:str, service:str) -> str:
-    fingerprint = FINGERPRINT
-    key_private = SSH_PRIVATE
-    clave_key = CLAVE_OF_KEY
-
-    client = paramiko.SSHClient()
-
+    client = None
     try:
-        client.load_host_keys(fingerprint)
-        ssh_log.info(f"Claves de host cargadas.")
-    except FileNotFoundError:
-        ssh_log.error(f"Archivo known_hosts no encontrado.")
-        return "No localizado"
-    except Exception as e:
-        ssh_log.error(f"Fallo al cargar claves de host para {ip}: {e}", exc_info=True)
-        return "No localizado"
-
-    client.set_missing_host_key_policy(paramiko.RejectPolicy())
-
-    try:
-        private_key = paramiko.RSAKey.from_private_key_file(key_private, password=clave_key)
-        ssh_log.info(f"Intentando conectar a {ip} para verificar estado de {service}")
-        
-        client.connect(hostname=ip, username=str("monitoreo"), pkey=private_key, timeout=10)
-        ssh_log.info(f"Conexión SSH establecida con éxito a {ip}.")
+        client = connect_client(ip)
+        if client is None:
+            ssh_log.error(f"No se pudo establecer la conexión SSH en la {ip}.")
+            return False
 
         if not service.endswith('.service'):
             service_extend = f"{service}.service"
@@ -269,14 +209,11 @@ def status_service(ip:str, service:str) -> str:
             service_extend = service
             
         command = f"systemctl status {service_extend}"
-        
         ssh_log.info(f"Ejecutando comando remoto para estado: '{command}' en {ip}")
         
         _stdin, stdout, stderr = client.exec_command(command)
-        
         output = stdout.read().decode('utf-8').strip()
         error_output = stderr.read().decode('utf-8').strip()
-        
         exit_status = stdout.channel.recv_exit_status()
 
         if exit_status == 0:

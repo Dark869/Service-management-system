@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from db import models
 from services_management_system.middlewares.loginRequest import login_request
-from services_management_system.utils.ssh import verify_fingerprint, status_service, administrator_server
+from services_management_system.utils.ssh import status_service, administrator_server
 import logging
 
 ERROR_MESSAGES = {
