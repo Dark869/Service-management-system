@@ -7,8 +7,9 @@
 {% endblock %}
 
 {% block encabezado %}Administrador de servidores{% endblock %}
+
 {% block contenido %}
-<div class="row">
+<div class="row w-100">
   <div class="col-sm-3">
     <div class="container mt-3">
       <table class="table">
@@ -18,8 +19,9 @@
           </tr>
         </thead>
         <tbody>
-          {% for server in servers %}
-            <tr class="table-success">
+          {% if servers %}
+            {% for server in servers %}
+              <tr class="table-success">
                 <td>
                   <form method="POST" action="">
                     {% csrf_token %}
@@ -27,52 +29,64 @@
                     <button type="submit" class="btn">{{ server }}</button>  
                   </form>
                 </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr class="table-warning">
+              <td class="text-center">No hay servidores registrados</td>
             </tr>
-          {% endfor %}
+          {% endif %}
         </tbody>
       </table>
     </div>
   </div>
+
   <div class="col-sm-9">
     <div class="container mt-3">
-        <table class="table">
-          <thead class="table-primary">
-            <tr>
-              <th>Servicio</th>
-              <th>Status</th>
-    	        <th>Acción</th>
-            </tr>
-          </thead>
+      <table class="table">
+        <thead class="table-primary">
+          <tr>
+            <th>Servicio</th>
+            <th>Status</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
         <tbody>
-          {% for service, status in services.items %}
-            <tr class="table-success" id="tablaMonitoreo"></tr>
-              <td>{{ service }}</td>
-              <td>{{ status }}</td>
-              <td>
-                <form method="POST" action="">
+          {% if services %}
+            {% for service, status in services.items %}
+              <tr class="table-success" id="tablaMonitoreo">
+                <td>{{ service }}</td>
+                <td>{{ status }}</td>
+                <td>
+                  <form method="POST" action="" style="display:inline;">
                     {% csrf_token %}
                     <input type="hidden" name="server_name" value="{{ selected_server }}">
                     <input type="hidden" name="service_name" value="{{ service }}">
                     <input type="hidden" name="option" value="start">
                     <button type="submit" class="btn btn-success btn-sm">Iniciar</button>  
-                </form>
-                <form method="POST" action="">
+                  </form>
+                  <form method="POST" action="" style="display:inline;">
                     {% csrf_token %}
                     <input type="hidden" name="server_name" value="{{ selected_server }}">
                     <input type="hidden" name="service_name" value="{{ service }}">
                     <input type="hidden" name="option" value="restart">
-                    <button type="submit" class="btn btn-success btn-sm">Reiniciar</button>  
-                </form>
-                <form method="POST" action="">
+                    <button type="submit" class="btn btn-warning btn-sm">Reiniciar</button>  
+                  </form>
+                  <form method="POST" action="" style="display:inline;">
                     {% csrf_token %}
                     <input type="hidden" name="server_name" value="{{ selected_server }}">
                     <input type="hidden" name="service_name" value="{{ service }}">
                     <input type="hidden" name="option" value="stop">
-                    <button type="submit" class="btn btn-success btn-sm">Apagar</button>  
-                </form>
-              </td>
+                    <button type="submit" class="btn btn-danger btn-sm">Apagar</button>  
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr class="table-warning">
+              <td colspan="3" class="text-center">No hay servicios registrados</td>
             </tr>
-          {% endfor %}
+          {% endif %}
         </tbody>
       </table>
     </div>
