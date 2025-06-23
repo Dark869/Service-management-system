@@ -156,6 +156,7 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
 
 SSH_PUBLIC = os.environ.get('SSH_PUBLIC')
 SSH_PRIVATE = os.environ.get('SSH_PRIVATE')
+CLAVE_OF_KEY = os.environ.get('CLAVE_OF_KEY')
 FINGERPRINT = os.environ.get('FINGERPRINT')
 
 TOKEN_BOT = os.environ.get('TOKEN_BOT')
@@ -182,6 +183,13 @@ LOG_DEFINITIONS = {
     'service_registration': {
         'filename': 'RegistroServicio.log',
         'logger_name_prefix': 'RegistroServicio',
+        'level': 'INFO',
+        'maxBytes': 5 * 1024 * 1024,
+        'backupCount': 5,
+    },
+    'server_administrator': {
+        'filename': 'serverAdministrator.log',
+        'logger_name_prefix': 'serverAdministrator',
         'level': 'INFO',
         'maxBytes': 5 * 1024 * 1024,
         'backupCount': 5,

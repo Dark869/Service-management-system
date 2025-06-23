@@ -35,8 +35,8 @@ def registerService(request: HttpResponse)  -> HttpResponse:
             service_registration_log.info("Se pasaron parametros vacios")
             errores.append(ERROR_MESSAGES['empty_fields'])
             return render(request, t, {'errores': errores})
-        
-        if models.services.objects.filter(name = nameService).exists() and models.servers.objects.filter(server = nameServer).exists():
+
+        if models.servers.objects.filter(name = nameService).exists() and models.servers.objects.filter(name = nameServer).exists():
             service_registration_log.info("Intento fallido, servicio ya registrado")
             errores.append(ERROR_MESSAGES['existen_fields'])
             return render(request, t, {'errores': errores})
