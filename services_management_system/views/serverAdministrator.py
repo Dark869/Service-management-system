@@ -14,7 +14,7 @@ EXISTO_MESSAGES = {
 }
 
 @login_request
-def serverAdministrator(request: HttpResponse)  -> HttpResponse:
+def server_Administrator(request: HttpResponse)  -> HttpResponse:
     t = 'monitoreo.html'
     servers = models.servers.objects.all()
     serversName = []

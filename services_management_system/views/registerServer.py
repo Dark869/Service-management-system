@@ -18,7 +18,7 @@ EXISTO_MESSAGES = {
 server_registration_log = logging.getLogger('registerServer')
 
 @login_request
-def registerServer(request: HttpResponse)  -> HttpResponse:
+def register_Server(request: HttpResponse)  -> HttpResponse:
     t = 'registerServer.html'
     if request.method == 'GET':
         return render(request, t)

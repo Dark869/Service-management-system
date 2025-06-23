@@ -21,7 +21,7 @@ EXISTO_MESSAGES = {
 service_registration_log = logging.getLogger('RegistroServicio')
 
 @login_request
-def registerService(request: HttpResponse)  -> HttpResponse:
+def register_Service(request: HttpResponse)  -> HttpResponse:
     t = 'registerService.html'
     if request.method == 'GET':
         return render(request, t)
@@ -51,11 +51,11 @@ def registerService(request: HttpResponse)  -> HttpResponse:
                     exito.append(EXISTO_MESSAGES['exito'])
                     return render(request, t, {'correctos': exito})
                 except:
-                    service_registration_log.error(f"Registro de servicio fallido. Verificar en log de SSH")
+                    service_registration_log.error("Registro de servicio fallido. Verificar en log de SSH")
                     errores.append(ERROR_MESSAGES['register_failed'])
                     return render(request, t, {'errores': errores})
             else:
-                service_registration_log.error(f"Fallo al registrar el servicio por servicio no instalado. Revisa los logs de SSH")
+                service_registration_log.error("Fallo al registrar el servicio por servicio no instalado. Revisa los logs de SSH")
                 errores.append(ERROR_MESSAGES['service_notfound'])
                 return render(request, t, {'errores': errores})
         except:
