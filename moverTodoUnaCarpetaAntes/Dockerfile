@@ -1,16 +1,15 @@
 FROM python:3.11
 
-RUN mkdir /code
-COPY ./requirements.txt /code
 WORKDIR /code
 
-RUN pip install -r requirements.txt
+COPY ./requirements.txt .
+COPY ./run.sh /start/
 
-RUN mkdir /start
-COPY ./run.sh /start
-RUN chmod +x /start/run.sh
+RUN mkdir -p /start \
+ && chmod +x /start/run.sh \
+ && pip install -r requirements.txt \
+ && useradd tazo -s /bin/bash
 
-RUN useradd tazo -s /bin/bash
 USER tazo
 
 CMD ["/start/run.sh"]
