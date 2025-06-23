@@ -6,9 +6,9 @@ SSHD_PACKAGE=""
 PACKAGE_MANAGER=""
 
 echo "#####################################################################"
-echo "#           Iniciando configuración del usuario '$MONITOR_USER'            #"
+echo "#           Iniciando configuración del usuario '$MONITOR_USER'     #"
 echo "#          Por favor, introduce tu contraseña de administrador      #"
-echo "#          cuando se te solicite (para sudo).                     #"
+echo "#          cuando se te solicite (para sudo).                       #"
 echo "#####################################################################"
 echo ""
 
