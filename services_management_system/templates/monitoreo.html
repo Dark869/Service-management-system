@@ -4,6 +4,7 @@
 {% load static %}
 
 {% block scripts %}
+<script src="{% static 'scripts/monitor.js' %}"></script>
 {% endblock %}
 
 {% block encabezado %}Administrador de servidores{% endblock %}
@@ -43,7 +44,7 @@
 
   <div class="col-sm-9">
     <div class="container mt-3">
-      <table class="table">
+      <table class="table" >
         <thead class="table-primary">
           <tr>
             <th>Servicio</th>
@@ -51,12 +52,13 @@
             <th>Acción</th>
           </tr>
         </thead>
+        <input type="hidden" name="name_server" id="name_server" value="{{ name_server}}">
         <tbody>
           {% if services %}
             {% for service, status in services.items %}
-              <tr class="table-success" id="tablaMonitoreo">
+              <tr class="table-success" id="service-{{ service|slugify }}">
                 <td>{{ service }}</td>
-                <td>{{ status }}</td>
+                <td class="status-{{service}}">{{ status }}</td>
                 <td>
                   <form method="POST" action="" style="display:inline;">
                     {% csrf_token %}
