@@ -1,6 +1,5 @@
 import logging
 import paramiko
-import os
 from services_management_system.settings import FINGERPRINT, SSH_PUBLIC, SSH_PRIVATE, CLAVE_OF_KEY
 
 ssh_log = logging.getLogger('SSH')
@@ -35,7 +34,7 @@ def register_server(ip: str, password: str) -> bool:
                 with open(key_public, 'r') as f:
                     public_key_content = f.read().strip()
             except FileNotFoundError:
-                ssh_log.error(f"Archivo de clave pública no encontrado.")
+                ssh_log.error("Archivo de clave pública no encontrado.")
                 registration_success = False
 
             if public_key_content and registration_success:
@@ -47,7 +46,7 @@ def register_server(ip: str, password: str) -> bool:
                     f"chmod 600 \"${{REMOTE_HOME_DIR}}\"/.ssh/authorized_keys"
                 )
                 ssh_log.info(f"Copiando la clave pública a authorized_keys en {ip}...")
-                _stdin, stdout, stderr = client.exec_command(command)
+                stderr = client.exec_command(command)
                 error_key_copy = stderr.read().decode('utf-8').strip()
 
                 if error_key_copy:
@@ -89,9 +88,9 @@ def connect_client(ip: str) -> paramiko.SSHClient:
     
     try:
         client.load_host_keys(fingerprint)
-        ssh_log.info(f"Claves de host cargadas.")
+        ssh_log.info("Claves de host cargadas.")
     except FileNotFoundError:
-        ssh_log.error(f"Archivo known_hosts no encontrado.")
+        ssh_log.error("Archivo known_hosts no encontrado.")
         return None
     except Exception as e:
         ssh_log.error(f"Fallo al cargar claves de host para {ip}: {e}", exc_info=True)
@@ -177,8 +176,6 @@ def administrator_server(ip: str, service: str, option: str) -> bool:
         ssh_log.info(f"Ejecutando comando remoto: '{command}' en {ip}")
 
         _stdin, stdout, stderr = client.exec_command(command, get_pty=True)
-        output = stdout.read().decode('utf-8').strip()
-        error_output = stderr.read().decode('utf-8').strip()
         exit_status = stdout.channel.recv_exit_status()
 
         if exit_status == 0:
@@ -188,7 +185,7 @@ def administrator_server(ip: str, service: str, option: str) -> bool:
             ssh_log.error(f"Fallo al ejecutar '{command}' en {ip}.")
             return False
     except:
-        ssh_log.error(f"Fallo de conexión SSH.")
+        ssh_log.error("Fallo de conexión SSH.")
         return False
     finally:
         if client:
@@ -201,7 +198,7 @@ def status_service(ip:str, service:str) -> str:
         client = connect_client(ip)
         if client is None:
             ssh_log.error(f"No se pudo establecer la conexión SSH en la {ip}.")
-            return False
+            return None
 
         if not service.endswith('.service'):
             service_extend = f"{service}.service"
@@ -234,18 +231,17 @@ def status_service(ip:str, service:str) -> str:
                 ssh_log.info(f"Servicio {service} en {ip} no encontrado.")
                 return 'not-found'
             else:
-                ssh_log.warning(f"No se pudo determinar el estado del servicio {service} en {ip} (status 3). Salida: '{output}'. Errores: '{error_output}'")
+                ssh_log.warning(f"No se pudo determinar el estado del servicio {service} en {ip}, Errores: '{error_output}'")
                 return 'unknown'
         else:
             if "Load state: not-found" in output or "Could not find unit" in error_output:
                  ssh_log.info(f"Servicio {service} en {ip} no encontrado (status {exit_status}/not-found).")
                  return 'not-found'
             else:
-                ssh_log.warning(f"Fallo al obtener el estado del servicio {service} en {ip}. "
-                                f"Código de salida: {exit_status}. Salida: '{output}'. Errores: '{error_output}'")
+                ssh_log.warning(f"Fallo al obtener el estado del servicio {service} en {ip}.")
                 return 'error'
     except:
-        ssh_log.error(f"Fallo de conexión SSH.")
+        ssh_log.error("Fallo de conexión SSH.")
         return "No localizado"
     finally:
         if client:
