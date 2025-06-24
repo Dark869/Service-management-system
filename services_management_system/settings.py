@@ -194,6 +194,13 @@ LOG_DEFINITIONS = {
         'maxBytes': 5 * 1024 * 1024,
         'backupCount': 5,
     },
+    'Login': {
+        'filename': 'login.log',
+        'logger_name_prefix': 'login',
+        'level': 'INFO',
+        'maxBytes': 5 * 1024 * 1024,
+        'backupCount': 5,
+    },
 }
 
 LOGGING = {
