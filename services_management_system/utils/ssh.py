@@ -7,6 +7,18 @@ from services_management_system.settings import FINGERPRINT, SSH_PUBLIC, SSH_PRI
 ssh_log = logging.getLogger('SSH')
 
 def register_server(ip: str, password: str) -> bool:
+    """
+    Funcion para configurar comunicacion SSH con el servidor registrado, usando la libreria paramiko
+    se configura el envio de llaves  asi como la copia de la clave de host para la verificación.
+    Args:
+        ip (str): IP del servidor a registrar.
+        password (str): Contraseña del usuario creado mediante el script de instalacion.
+
+    Returns:
+        bool: 
+            -False: Si la comunicacion o algun paso de la configuracion falla
+            -True: Si la comunicacion o configuracion fue exitosa
+    """
     fingerprint = FINGERPRINT
     key_public = SSH_PUBLIC
 
@@ -88,6 +100,15 @@ def register_server(ip: str, password: str) -> bool:
     return registration_success
 
 def connect_client(ip: str) -> paramiko.SSHClient:
+    """
+    Funcion que se encarga de conectar cliente SSH atravez de libreria paramiko.
+    Args:
+        ip (str): IP del servidor
+
+    Returns:
+        paramiko.SSHClient: Cliente de SSH conectado
+        None: Error en la conexion SSH
+    """
     fingerprint = FINGERPRINT
     key_private = SSH_PRIVATE
     clave_key = CLAVE_OF_KEY
@@ -128,6 +149,18 @@ def connect_client(ip: str) -> paramiko.SSHClient:
         return None
 
 def verify_service(service: str, ip: str) -> bool:
+    """
+    Funcion que verifica si el servicio dado existe en el servido con la IP dada
+    Args:
+        service (str): Servicio para verificar existencia
+        ip (str): IP del servidor que guarda el servicio
+
+    Returns:
+        bool:
+            -False: Si el servicio no existe en el servidor
+            -True: Si el servicio si existe en el servidor
+            -None: Si hubo un error al establecer la conexion SSH
+    """
     client = None 
     try:
         client = connect_client(ip)
@@ -167,6 +200,19 @@ def verify_service(service: str, ip: str) -> bool:
             ssh_log.info(f"Conexión SSH a {ip} cerrada.")
 
 def administrator_server(ip: str, service: str, option: str) -> bool:
+    """_summary_
+
+    Args:
+        ip (str): IP del servidor
+        service (str): Servicio existente en el servidor
+        option (str): Opcion a realizar(start,stop,restart)
+
+    Returns:
+        bool: 
+            -None: Si hubo un error en la conexion SSH
+            -False: Si no se logro ejecutar el comando o hubo un error
+            -True: Si se ejecuto el comando correctamente
+    """
     client = None
     try:
         client = connect_client(ip)
@@ -200,6 +246,16 @@ def administrator_server(ip: str, service: str, option: str) -> bool:
             ssh_log.info(f"Conexión SSH a {ip} cerrada.")
 
 def status_service(ip:str, service:str) -> str:
+    """
+    Funcion para verificar el estado de un servicio existente en un servidor.
+    Args:
+        ip (str): IP del servidor
+        service (str): Servicio que se monitoreara y que exita en el server
+
+    Returns:
+        str: Estado del servicio
+        None: Si la conexion SSH fallo
+    """
     client = None
     try:
         client = connect_client(ip)

@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG')
 
 ALLOWED_HOSTS = ["*"]
 
@@ -190,6 +190,13 @@ LOG_DEFINITIONS = {
     'server_administrator': {
         'filename': 'serverAdministrator.log',
         'logger_name_prefix': 'serverAdministrator',
+        'level': 'INFO',
+        'maxBytes': 5 * 1024 * 1024,
+        'backupCount': 5,
+    },
+    'Login': {
+        'filename': 'login.log',
+        'logger_name_prefix': 'login',
         'level': 'INFO',
         'maxBytes': 5 * 1024 * 1024,
         'backupCount': 5,
