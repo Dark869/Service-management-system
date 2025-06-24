@@ -5,8 +5,18 @@ from services_management_system.middlewares.loginRequest import login_request
 from services_management_system.utils.ssh import status_service, administrator_server
 import logging
 
+log_administrator = logging.getLogger('serverAdministrator')
+
 @login_request
 def server_Administrator(request: HttpResponse)  -> HttpResponse:
+    """
+    Funcion encargada de administrar los servicios y lo que se ordena hacer, asi como de regresar el estado de estos
+    Args:
+        request (HttpResponse)
+
+    Returns:
+        HttpResponse: render de la pagina que muestra los estados de los servicios
+    """
     t = 'monitoreo.html'
     servers = models.servers.objects.all()
     servers_Name = []
@@ -41,12 +51,14 @@ def server_Administrator(request: HttpResponse)  -> HttpResponse:
                     status = status_service(server_unic.ip_address, service.name)
                     service_status[name] = status
                 context['services'] = service_status
-
+                log_administrator.info('Se recupero la informacion correctamente')
                 return render(request, t, context)
             except:
+                log_administrator.error('Error al  informacion correctamente')
                 return render(request, t, context)
         else:
             if not name_service:
+                log_administrator.error('Se paso servicio vacio')
                 return render(request, t, context)
             else:
                 if option == "start" or option == "stop" or option == "restart":
@@ -58,8 +70,11 @@ def server_Administrator(request: HttpResponse)  -> HttpResponse:
                             status = status_service(server_unic.ip_address, service.name)
                             service_status[name] = status
                         context['services'] = service_status
+                        log_administrator.info('Se modifico el estado del servicio correctamente')
                         return render(request, t, context)
                     else:
+                        log_administrator.error('Error al modificar el estado del servicio')
                         return render(request, t, context)
                 else:
+                    log_administrator.error('Se paso opcion incorrecta')
                     return render(request, t, context)

@@ -19,6 +19,14 @@ server_registration_log = logging.getLogger('registerServer')
 
 @login_request
 def register_Server(request: HttpResponse)  -> HttpResponse:
+    """
+    Funcion encargada del proceso de registrar servidor.
+    Args:
+        request (HttpResponse)
+
+    Returns:
+        HttpResponse: render de la pagina que muestra si fue un exito o si fallo 
+    """
     t = 'registerServer.html'
     if request.method == 'GET':
         return render(request, t)
