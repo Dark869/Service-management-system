@@ -26,28 +26,28 @@ def register_Service(request: HttpResponse)  -> HttpResponse:
     if request.method == 'GET':
         return render(request, t)
     elif request.method == 'POST':
-        nameService = request.POST.get('nameservice', '').strip()
-        nameServer = request.POST.get('nameserver', '').strip()
+        name_Service = request.POST.get('nameservice', '').strip()
+        name_Server = request.POST.get('nameserver', '').strip()
         errores = []
         exito = []
 
-        if not nameService or not nameServer:
+        if not name_Service or not name_Server:
             service_registration_log.info("Se pasaron parametros vacios")
             errores.append(ERROR_MESSAGES['empty_fields'])
             return render(request, t, {'errores': errores})
 
-        if models.servers.objects.filter(name = nameService).exists() and models.servers.objects.filter(name = nameServer).exists():
+        if models.servers.objects.filter(name = name_Service).exists() and models.servers.objects.filter(name = name_Server).exists():
             service_registration_log.info("Intento fallido, servicio ya registrado")
             errores.append(ERROR_MESSAGES['existen_fields'])
             return render(request, t, {'errores': errores})
         
         try:
-            server = models.servers.objects.get(name=nameServer)
-            if verify_service(nameService, server.ip_address):
+            server = models.servers.objects.get(name=name_Server)
+            if verify_service(name_Service, server.ip_address):
                 try:
-                    service = models.services(name = nameService, server = server)
+                    service = models.services(name = name_Service, server = server)
                     service.save()
-                    service_registration_log.info(f"Registro se servicio {nameService} exitoso para el server {nameServer}")
+                    service_registration_log.info(f"Registro se servicio {name_Service} exitoso para el server {name_Server}")
                     exito.append(EXISTO_MESSAGES['exito'])
                     return render(request, t, {'correctos': exito})
                 except:
@@ -59,6 +59,6 @@ def register_Service(request: HttpResponse)  -> HttpResponse:
                 errores.append(ERROR_MESSAGES['service_notfound'])
                 return render(request, t, {'errores': errores})
         except:
-            service_registration_log.error(f"Server {nameServer} no registrado")
+            service_registration_log.error(f"Server {name_Server} no registrado")
             errores.append(ERROR_MESSAGES['server_notfound'])
             return render(request, t, {'errores': errores})
