@@ -1,5 +1,7 @@
 import logging
 import paramiko
+import os
+from paramiko import HostKeys
 from services_management_system.settings import FINGERPRINT, SSH_PUBLIC, SSH_PRIVATE, CLAVE_OF_KEY
 
 ssh_log = logging.getLogger('SSH')
@@ -7,7 +9,7 @@ ssh_log = logging.getLogger('SSH')
 def register_server(ip: str, password: str) -> bool:
     fingerprint = FINGERPRINT
     key_public = SSH_PUBLIC
-    
+
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -15,7 +17,7 @@ def register_server(ip: str, password: str) -> bool:
 
     try:
         ssh_log.info(f"Intentando la PRIMERA conexión a {ip}")
-        client.connect(hostname=ip, username=str("monitoreo"), password=password, timeout=10)
+        client.connect(hostname=ip, username="monitoreo", password=password, timeout=10)
         ssh_log.info(f"Conexión SSH inicial establecida con éxito a {ip}.")
     except paramiko.AuthenticationException as e:
         ssh_log.error(f"Fallo al conectar a {ip}. Verifica credenciales. Detalle: {e}")
@@ -37,16 +39,16 @@ def register_server(ip: str, password: str) -> bool:
                 ssh_log.error("Archivo de clave pública no encontrado.")
                 registration_success = False
 
-            if public_key_content and registration_success:
+            if public_key_content:
                 command = (
                     f"REMOTE_HOME_DIR=$(getent passwd monitoreo | cut -d: -f6); "
-                    f"mkdir -p \"${{REMOTE_HOME_DIR}}\"/.ssh && "
-                    f"chmod 700 \"${{REMOTE_HOME_DIR}}\"/.ssh && "
-                    f"echo '{public_key_content}' | tee -a \"${{REMOTE_HOME_DIR}}\"/.ssh/authorized_keys > /dev/null && "
-                    f"chmod 600 \"${{REMOTE_HOME_DIR}}\"/.ssh/authorized_keys"
+                    f"mkdir -p \"$REMOTE_HOME_DIR/.ssh\" && "
+                    f"chmod 700 \"$REMOTE_HOME_DIR/.ssh\" && "
+                    f"echo '{public_key_content}' | tee -a \"$REMOTE_HOME_DIR/.ssh/authorized_keys\" > /dev/null && "
+                    f"chmod 600 \"$REMOTE_HOME_DIR/.ssh/authorized_keys\""
                 )
                 ssh_log.info(f"Copiando la clave pública a authorized_keys en {ip}...")
-                stderr = client.exec_command(command)
+                _, stdout, stderr = client.exec_command(command)
                 error_key_copy = stderr.read().decode('utf-8').strip()
 
                 if error_key_copy:
@@ -54,17 +56,23 @@ def register_server(ip: str, password: str) -> bool:
                     registration_success = False
                 else:
                     ssh_log.info(f"Clave pública copiada exitosamente en {ip}.")
-            elif registration_success:
+            else:
                 ssh_log.error("Contenido de la clave pública no disponible.")
                 registration_success = False
+
             if registration_success:
                 try:
-                    host_keys = client.get_host_keys()
-                    host_keys.save(fingerprint)
-                    ssh_log.info(f"Clave de host para {ip} guardada.")
+                    known_hosts = HostKeys()
+                    if os.path.exists(fingerprint):
+                        known_hosts.load(fingerprint)
+                    key = client.get_transport().get_remote_server_key()
+                    known_hosts.add(ip, key.get_name(), key)
+                    known_hosts.save(fingerprint)
+                    ssh_log.info(f"Clave de host para {ip} añadida a {fingerprint}.")
                 except Exception as e:
-                    ssh_log.error(f"Fallo al guardar la clave de host para {ip}: {e}")
+                    ssh_log.error(f"Fallo al añadir clave de host para {ip}: {e}")
                     registration_success = False
+
         except paramiko.SSHException as e:
             ssh_log.error(f"Fallo de SSH durante la configuración post-conexión en {ip}: {e}")
             registration_success = False
@@ -72,9 +80,8 @@ def register_server(ip: str, password: str) -> bool:
             ssh_log.error(f"Ocurrió un error durante la configuración post-conexión en {ip}: {e}", exc_info=True)
             registration_success = False
         finally:
-            if client:
-                client.close()
-                ssh_log.info(f"Conexión SSH a {ip} cerrada.")
+            client.close()
+            ssh_log.info(f"Conexión SSH a {ip} cerrada.")
     else:
         ssh_log.info(f"No se realizaron pasos de configuración adicionales para {ip} ya que la conexión inicial falló.")
 

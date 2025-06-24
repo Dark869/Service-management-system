@@ -15,6 +15,7 @@ def server_Administrator(request: HttpResponse)  -> HttpResponse:
         'servers': servers_Name,
         'services': {},
         'selected_server': None,
+        'name_server': None,
     }
 
 
@@ -29,6 +30,7 @@ def server_Administrator(request: HttpResponse)  -> HttpResponse:
         option = request.POST.get('option', '').strip()
         service_status = {}
         context['selected_server'] = name_server
+        context['name_server'] = name_server
 
         if not option:
             try:
