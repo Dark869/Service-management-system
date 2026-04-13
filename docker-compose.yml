@@ -2,9 +2,9 @@ version: '3.7'
 
 services:
    app:
-      image: tazodocker
+      build: .
       depends_on:
-         - bd
+         - db
       environment:
          SECRET_KEY: ${SECRET_KEY}
          BD_NAME: ${BD_NAME}
@@ -27,7 +27,7 @@ services:
                cpus: "3"
                memory: "1024M"
 
-   bd:
+   db:
       image: mariadb
       restart: always
       environment:
