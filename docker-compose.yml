@@ -2,7 +2,11 @@ version: '3.7'
 
 services:
    app:
+<<<<<<< HEAD
       image: app
+=======
+      build: .
+>>>>>>> e1b13e8d25a5e33a112668deb99f60e29bcb45f2
       depends_on:
          - db
       environment:
